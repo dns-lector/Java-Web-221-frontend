@@ -5,6 +5,12 @@ import AppContext from "../../AppContext";
 
 export default function Layout() {
     const {cart} = useContext(AppContext);
+    
+    const cartItemsCount = !cart ? 0 :
+        cart.cartItems.reduce((cnt, ci) => cnt += ci.quantity, 0); 
+
+    const cartTotal = !cart ? 0 :
+        cart.cartItems.reduce((cnt, ci) => cnt += ci.cartItemPrice, 0); 
 
     return <div className="main-container">
         <header>
@@ -14,7 +20,7 @@ export default function Layout() {
             <Link className="nav-item" to="/profile">Profile</Link>
             <Link className="nav-item" to="/admin">Admin</Link>
             <Link className="nav-item" to="/shop">Shop</Link>
-            <div>cart: {JSON.stringify(cart)}</div>
+            <div>cart: [{cartItemsCount}] ({cartTotal})</div>
         </header>
         <main><Outlet /></main>
         <footer>&copy; IT Step Academy, 2025</footer>

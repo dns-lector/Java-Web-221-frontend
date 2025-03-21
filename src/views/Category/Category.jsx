@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AppContext from "../../AppContext";
 import "./Category.css"
 
@@ -30,11 +30,28 @@ export default function Category() {
 }
 
 function ProductCard({product}) {
+    const {accessToken, request, setCart} = useContext(AppContext);
+    const navigate = useNavigate();
 
     const toCartClick = (e) => {
         e.stopPropagation();
         e.preventDefault();
-        console.log(product.productTitle);
+        if(!accessToken) {
+            if( confirm("Автентифікуйтесь для замовлень") ) {
+                navigate("/signin");
+            }
+            else {
+                return;
+            }
+        }
+        console.log(product.productId);
+        request("/cart", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: "productId=" + product.productId
+        }).then(setCart).catch(console.error);
     };
 
     return <Link to={"/product/" + product.productSlug} className="product-card">
@@ -49,10 +66,11 @@ function ProductCard({product}) {
 }
 /* 🛒
 
-Д.З. Забезпечити відображення на сторінках категорій
-- переліку інших (всіх) категорій з можливістю переходу на них
-* breadcrumbs (хлібні кріхти) - адреси даної сторінки з 
-   можливістю переходу на різні рівні
-   /Магазин/Скло/Виріб 115
-    ______  ____  
+Д.З. Забезпечити відображення віджета кошику з кількістю товарів у ньому
+та підказкою щодо суми кошику + Вивести реальну кількість товарів та їх вартість
+ 🛒(5)
+   |
+У кошику 5 товарів на загальну суму 100500 грн.
+
+Якщо кошик порожній, то у підказці так і зазначити
 */
